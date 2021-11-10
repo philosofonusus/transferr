@@ -65,4 +65,5 @@ app.post('/sendData', async (req, res) => {
         }
 })
 
+app.listen(80)
 https.createServer(options, app).listen(443);
