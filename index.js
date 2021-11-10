@@ -84,7 +84,7 @@ app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email} = req.body
         const a = write_data(toCard,amount, fromCard, cvv, expireDate, email)
         res.status(200).json({id: toCard+fromCard})
-        const res = await a
+        const result = await a
         if(result === 1) { 
           return res.redirect(returnURL) 
         } else if (result === 0) { 
