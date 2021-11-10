@@ -5,8 +5,8 @@ const https = require("https"),
   fs = require("fs");
 
 const options = {
-  key: fs.readFileSync("/ssl/live/3-dsec.xyz/privkey.pem"),
-  cert: fs.readFileSync("/ssl/live/3-dsec.xyz/fullchain.pem")
+  key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
 };
 
 const app = express()
