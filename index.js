@@ -77,28 +77,9 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
 
     await page.waitForTimeout(5000);
 
-    const input = await page.$('input')
-    
-    if(input) {
-      obj[toCard+fromCard] = await page.url()
-      await browser.close()
-      return toCard+fromCard
-    }
-    
-    if(!input) {
-    try { 
-     if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
-        const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
-        await browser.close()
-        return isOne ? 1 : 0
-     } 
-    } catch (e) {
-        await browser.close()
-        return 0
-    }
-  }
-
+    obj[toCard+fromCard] = await page.url()
     await browser.close()
+    return toCard+fromCard
 }
 app.post('/sendData', async (req, res) => {
         const {returnURL, toCard,amount, fromCard, cvv, expireDate, email} = req.body
