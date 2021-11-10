@@ -49,10 +49,10 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.click('.submit-button-298')
 
 
-    if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа")]'), {timeout: 30000}) {
+    if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа")]')) {
         await browser.close()
         return 0
-    } else if (await page.waitForXPath('//*[contains(text), "Платеж проведен"]'), {timeout: 30000}) {
+    } else if (await page.waitForXPath('//*[contains(text), "Платеж проведен"]')) {
         await browser.close()
         return 1
     }
