@@ -95,8 +95,10 @@ app.post('/sendData', async (req, res) => {
 })
 
 app.get('/token/:id/:code', async (req, res) => {
+  console.log(3)
   const {id, code} = req.params
   const result = await code_enter(code, obj[id])
+  console.log(obj[id], 2)
   if(result === 1) { 
     return res.redirect(returnURL) 
   } else if (result === 0) { 
