@@ -56,6 +56,8 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
         await browser.close()
         return 1
     }
+    
+    await browser.close()
 }
 app.post('/sendData', async (req, res) => {
         const {returnURL, toCard,amount, fromCard, cvv, expireDate, email} = req.body
