@@ -48,11 +48,15 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     
     await page.click('.submit-button-298')
 
-
-    if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
+    try {
+     if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
         const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
         await browser.close()
         return isOne ? 1 : 0
+     } 
+    } catch (e) {
+        await browser.close()
+        return 0
     }
 
     await browser.close()
