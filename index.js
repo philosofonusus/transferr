@@ -41,21 +41,16 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
 
     if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа")]')) {
         await browser.close()
-        throw new Error('Ошибка платежa')
+        return 0
     } else if (await page.waitForXPath('//*[contains(text), "Платеж проведен"]')) {
         await browser.close()
-        return 'successs'
+        return 1
     }
 }
 app.post('/sendData', async (req, res) => {
-    try {
         const {returnURL, toCard,amount, fromCard, cvv, expireDate, email} = req.body
         console.log(1)
-        await write_data(toCard,amount, fromCard, cvv, expireDate, email)
-        return res.redirect(returnURL)
-    } catch (e) {
-        return res.status(400)
-    }
+        return (await write_data(toCard,amount, fromCard, cvv, expireDate, email) === 0) ? res.redirect(returnURL) : res.status(400)
 })
 
 app.listen(5000)
