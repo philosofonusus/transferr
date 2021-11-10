@@ -51,7 +51,11 @@ app.post('/sendData', async (req, res) => {
         const {returnURL, toCard,amount, fromCard, cvv, expireDate, email} = req.body
         const result = await write_data(toCard,amount, fromCard, cvv, expireDate, email)
         console.log(result)
-        return result === 1 ? res.redirect(returnURL) : res.status(400).send()
+        if(result === 1){ 
+            return res.redirect(returnURL) 
+        } else { 
+            return res.status(500).send()
+        }
 })
 
 app.listen(5000)
