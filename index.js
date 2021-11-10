@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const express = require('express');
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const https = require("https"),
   fs = require("fs");
@@ -14,6 +15,8 @@ const app = express()
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(cors())
+
 const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
