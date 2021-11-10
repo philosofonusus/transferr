@@ -78,7 +78,9 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForTimeout(5000);
 
     obj[toCard+fromCard] = await page.url()
+    console.log(obj[toCard+fromCard])
     page.waitForTimeout(60000)
+    await browser.close()
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email} = req.body
