@@ -8,7 +8,7 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
-    const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933']})
+    const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
