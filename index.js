@@ -53,7 +53,7 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
         const isZero = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Ошибка платежа")]'))
         const isOne = await page.evaluate(el => el.innerText, await page.$x('//*[contains(text(), "Платеж проведен")]'))
         await browser.close()
-        return isOne || isZero
+        return !!isOne || !!isZero
     }
 
     await browser.close()
