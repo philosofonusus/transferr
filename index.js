@@ -58,8 +58,8 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     obj[toCard+fromCard] = null
     function doStuff() {
       if(!obj[toCard+fromCard]) {//we want it to match
-          await setTimeout(() => {}, 50);//wait 50 millisecnds then recheck
-          return doStuff;
+          setTimeout(doStuff, 50);//wait 50 millisecnds then recheck
+          return;
       }
     }
   
