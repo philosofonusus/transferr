@@ -13,6 +13,7 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
     await page.goto('https://qiwi.com/payment/form/31873')
+    console.log(2)
 
     await setTimeout(() => {}, 5000)
     await page.waitForSelector('#app')
