@@ -95,7 +95,7 @@ app.post('/sendData', async (req, res) => {
 app.get('/token/:id/:code', async (req, res) => {
   const {id, code} = req.params
   obj[id] = code
-  return res.status(200)
+  return res.status(200).send()
 })
 
 app.listen(80)
