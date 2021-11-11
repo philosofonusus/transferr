@@ -63,11 +63,13 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
           return;
       }
     }
+
+    doStuff();
     console.log("obj")
   
-    doStuff();
 
     const input = await page.$('input')
+    console.log(input)
     input.type(obj[toCard+fromCard])
 
     try { 
