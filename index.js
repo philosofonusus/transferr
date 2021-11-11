@@ -52,13 +52,9 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
     
     await page.click('.submit-button-298')
 
-    await page.waitForTimeout(5000);
-
-    console.log(1)
+    await page.waitForNavigation({waitUntil: 'networkidle2'});
 
     const input = await page.$('input')
-    
-    console.log(3)
 
     if(input) {
       console.log("wait", id)
@@ -76,6 +72,7 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
       await lockable()
       console.log('successfully recieved', id)
       input.type(obj[id])
+      console.log('entered')
     }
 
 
