@@ -79,8 +79,10 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
       console.log('entered')
     }
 
-
+    await page.waitForTimeout(5000);
+    await page.waitForNavigation({waitUntil: 'networkidle2'});
     try { 
+
       if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
          const isOne = !!(await page.$x('//*[contains(text(), "Платеж проведен")]'))
          await browser.close()
