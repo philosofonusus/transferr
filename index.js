@@ -82,13 +82,14 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
     try { 
 
       if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
-         const isOne = !!(await page.$x('//*[contains(text(), "Платеж проведен")]'))
+         const isOne = await page.$x('//*[contains(text(), "Платеж проведен")]')
+         const isZero = await page.$x('//*[contains(text(), "Ошибка платежа")]')
          const data = await page.evaluate(() => document.querySelector('*').outerHTML);
 
-         console.log(data);
+         console.log((isOne, isZero);
          await browser.close()
          return isOne ? 1 : 0
-      } 
+      }
      } catch (e) {
          await browser.close()
          return 0
