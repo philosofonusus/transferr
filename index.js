@@ -54,11 +54,11 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
 
     await page.waitForNavigation({waitUntil: 'networkidle2'});
 
-    page.$eval('input', (element) => {
-      console.log(element.innerHTML)
-    })
+    await page.waitForTimeout(5000);
 
     const input = await page.$('input')
+    const a = await page.$eval(input, el => el.outerHTML)
+    console.log(a)
 
     if(input) {
       console.log("wait", id)
