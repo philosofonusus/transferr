@@ -55,7 +55,6 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
     await page.waitForNavigation({waitUntil: 'networkidle2'});
 
     const input = await page.$$('input')[0]
-    console.log(input.innerHTML)
     page.$eval('input', (element) => {
       console.log(element.innerHTML)
     })
