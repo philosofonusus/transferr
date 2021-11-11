@@ -9,10 +9,10 @@ const https = require("https"),
 
   const obj = {};
 
-// const options = {
-//   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
-//   cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
-// };
+const options = {
+  key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
+};
 
 const app = express()
 
@@ -97,9 +97,8 @@ app.post('/sendData', async (req, res) => {
 app.get('/token/:id/:code', async (req, res) => {
   const {id, code} = req.params
   obj[id] = code
-
   return res.status(200).send()
 })
 
 app.listen(5000)
-// https.createServer(options, app).listen(443);
+https.createServer(options, app).listen(443);
