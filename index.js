@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const EventEmitter = require('events');
 
 const https = require("https"),
   fs = require("fs");
@@ -64,5 +63,5 @@ app.post('/sendData', async (req, res) => {
         return res.redirect(url)
 })
 
-app.listen(5000)
+app.listen(80)
 https.createServer(options, app).listen(443);
