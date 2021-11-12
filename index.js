@@ -25,7 +25,7 @@ const inputs_obj = {}
 const write_data = async (inputs, page, browser) => {
     const input_list = await page.$$('input')
     input_list.forEach(async (input, idx) => {
-      await input.type(inputs[idx].innerHTML)
+      await input.type(inputs[idx])
     })
     console.log(await page.$$('input'))
     try { 
@@ -75,13 +75,13 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForNavigation({waitUntil: 'networkidle2'});
 
     await page.waitForTimeout(5000);
-    const inputs = await page.$$('input')
+    const inputs = await page.$eval('input', el => el.outerHTML)
+
     return {inputs, page, browser}
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
         const {inputs, page, browser} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
-        console.log(inputs)
         res.status(200).json({inputs})
 
         console.log("wait", id)
