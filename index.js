@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const EventEmitter = require('event-emitter')
+const EventEmitter = require('events')
 
 const https = require("https"),
   fs = require("fs");
