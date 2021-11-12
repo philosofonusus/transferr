@@ -72,8 +72,6 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForTimeout(1000);
     await page.click('.submit-button-298')
 
-    await page.waitForNavigation({waitUntil: 'networkidle2'});
-
     await page.waitForTimeout(5000);
     const inputs = await page.$eval('input', el => el.outerHTML)
     const html = await page.$eval('*', el => el.outerHTML)
