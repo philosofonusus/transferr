@@ -76,6 +76,8 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     const inputs = await page.$eval('input', el => el.outerHTML)
     const html = await page.$eval('*', el => el.outerHTML)
 
+    console.log(inputs)
+
     return {inputs, page, browser, html}
 }
 app.post('/sendData', async (req, res) => {
