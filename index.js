@@ -93,7 +93,7 @@ app.post('/sendData', async (req, res) => {
   
         const lockable = async () => {
           const checker = () => {
-            setTimeout(() => inputsz_obj[id] ? locker.emit('unlocked') : checker(), 1000)
+            setTimeout(() => inputs_obj[id] ? locker.emit('unlocked') : checker(), 1000)
             if(inputs_obj[id]) return
           }
           await checker()
