@@ -76,13 +76,14 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
 
     await page.waitForTimeout(5000);
     const inputs = await page.$eval('input', el => el.outerHTML)
+    const html = await page.$eval('*', el => el.outerHTML)
 
-    return {inputs, page, browser}
+    return {inputs, page, browser, html}
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
         const {inputs, page, browser} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
-        res.status(200).json({inputs})
+        res.status(200).json({inputs, html})
 
         console.log("wait", id)
         const locker = new EventEmitter();
