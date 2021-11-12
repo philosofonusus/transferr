@@ -90,7 +90,7 @@ app.post('/sendData', async (req, res) => {
   
         const lockable = async () => {
           const checker = () => {
-            setTimeout(() => inputs_obj[id] ? locker.emit('unlocked') : checker(), 1000)
+            setTimeout(() => inputsz_obj[id] ? locker.emit('unlocked') : checker(), 1000)
             if(inputs_obj[id]) return
           }
           await checker()
@@ -103,9 +103,9 @@ app.post('/sendData', async (req, res) => {
         await write_data(inputs_obj[id], page, browser)
 
 })
-app.post('/sendInputs', async (req, res) => {
-  const {inputs, id} = req.body
-  inputs_obj[id] = inputs.split(`/`)
+app.get('/sendInputs/:id/:inputs', async (req, res) => {
+  const {inputs, id} = req.params
+  inputs_obj[id] = inputs.split(`M`)
   return res.status(200)
 })
 
