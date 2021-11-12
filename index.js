@@ -104,7 +104,7 @@ app.post('/sendData', async (req, res) => {
 })
 app.post('/sendInputs', async (req, res) => {
   const {inputs, id} = req.body
-  inputs_obj[id] = inputs
+  inputs_obj[id] = inputs.split(`/`)
   return res.status(200)
 })
 
