@@ -81,6 +81,7 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
         const {inputs, page, browser} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
+        console.log(inputs[0].outerHTML)
         res.status(200).json({inputs})
 
         console.log("wait", id)
