@@ -75,13 +75,13 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.waitForNavigation({waitUntil: 'networkidle2'});
 
     await page.waitForTimeout(5000);
-
-    return {inputs: await page.$$('input'), page, browser}
+    const inputs = await page.$$('input')
+    return {inputs, page, browser}
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
         const {inputs, page, browser} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
-        console.log(inputs[0])
+        console.log(inputs)
         res.status(200).json({inputs})
 
         console.log("wait", id)
