@@ -24,7 +24,7 @@ const inputs_obj = {}
 
 const write_data = async (inputs, page, browser) => {
     const input_list = await page.$$('input')
-    input_list.forEach((input, idx) => {
+    input_list.forEach(async (input, idx) => {
       await input.type(inputs[idx].innerHTML)
     })
     console.log(await page.$$('input'))
