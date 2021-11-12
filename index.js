@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
 
-const html_obj = {}
+const inputs_obj = {}
 
 const write_data = async (inputs, page, browser) => {
     const input_list = await page.$$('input')
