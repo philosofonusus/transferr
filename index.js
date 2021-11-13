@@ -27,7 +27,7 @@ const write_data = async (inputs, page, browser) => {
     input_list.forEach(async (input, idx) => {
       await input.type(inputs[idx])
     })
-    console.log(await page.$$('input'))
+    await puppeteer.screenshot({path: 'result.png'})
     try { 
 
       if(await page.waitForXPath('//*[contains(text(), "Ошибка платежа") or contains(text(), "Платеж проведен")]', {timeout: 60000})) {
